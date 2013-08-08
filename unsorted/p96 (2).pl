@@ -373,7 +373,7 @@ use Moose;
 								$n++;
 							}
 						} elsif ( allSame( $numberPositions{$num}{'y'} )) {
-						# for elements in the same row
+						# for elements in the same row						
 							my $yPos = $numberPositions{$num}{'y'}->[0];
 							#print "Found elimination for $num for row $yPos in box $row,$col\n";
 							my $rowElementsToSkip = Set::Object->new ( $col*3 .. $col*3+2 );
@@ -389,7 +389,7 @@ use Moose;
 									}
 								}
 								$n++;
-							}
+							}							
 						}
 					}
 				}
@@ -409,14 +409,13 @@ use Moose;
 
 	sub isSolved {
 		my $su = shift;
-		
-		my $allNumberSet = Set::Object->new ( 1..9 );
-		#check by ROW
 		my $nextRow = $su->rowIterator();
+		my $allNumberSet = Set::Object->new ( 1..9 );
+		my $rowSet = Set::Object->new ();
+		# firstly all boxes must contain at most one element
 		while ( my $row = $nextRow->()) {
-			my $rowSet = Set::Object->new;
+			my $rowSum = 0;
 			for my $boxEl ( @{$row} ) {
-				# firstly all boxes must contain at most one element
 				if  ( $boxEl->size != 1 ) {
 					return 0;
 				} else {
@@ -427,96 +426,64 @@ use Moose;
 			if ( $rowSet != $allNumberSet ) {
 				return 0;
 			}
-			# check if each column contains 1..9
 		}
 		
-		#check by COLUMN
-		my $nextCol = $su->colIterator();
-		while ( my $col = $nextCol->()) {
-			my $colSet = Set::Object->new;
-			for my $boxEl ( @{$col} ) {
-				# firstly all boxes must contain at most one element
-				if  ( $boxEl->size != 1 ) {
-					return 0;
-				} else {
-					$colSet->insert( $boxEl->members );
-				}
-			}
-			# check if each column contains 1..9
-			if ( $colSet != $allNumberSet ) {
-				return 0;
-			}			
-		}	
-		# check by BOX
-		my $nextBox = $su->boxIterator();
-		while ( my $box = $nextBox->() ) {
-			my $boxSet = Set::Object->new;
-			my $nextBoxEl = main::boxElementIterator($box);
-			while ( my $boxEl = $nextBoxEl->() ) {
-				# firstly all boxes must contain at most one element
-				if  ( $boxEl->size != 1 ) {
-					return 0;
-				} else {
-					$boxSet->insert( $boxEl->members );
-				}
-			}
-			# check if each column contains 1..9
-			if ( $boxSet != $allNumberSet ) {
-				return 0;
-			}			
-		}				
-
 		return 1;
 	}
 
-	sub clone {
+	sub makeDeepCopy {
 		my $s_orig = shift;
 		my $s_array_copy;
-		for my $i ( 0..8 ) {
-			for my $j ( 0..8 ) {
-				#print "$i $j".$s_orig->array->[$i][$j]."\n";
+		my $s_copy = Sudoku->new('array'=>$s_array_copy);
+		for my $i ( 0..26 ) {
+			for my $j ( 0..26 ) {
 				$s_array_copy->[$i][$j] = 
 					Set::Object->new($s_orig->array->[$i][$j]->members);
 			}
 		}
-		return Sudoku->new('array'=>$s_array_copy);
+		return $s_copy;
 	}
-
+	
 	sub guessAndCheck {
-		print "Sudoku->guessAndCheck() called\n";
 		my $s = shift;
-
+		
 		my $nextUnsolved = $s->getUnsolvedStatesIterator();
 		while (my $unsolvedEl = $nextUnsolved->() ) {
-			my $s_copy = $s->clone;
-			print "Making change at (".$unsolvedEl->{'row'},',',$unsolvedEl->{'col'},'), from',$unsolvedEl->{'from'},"to ",$unsolvedEl->{'to'},"\n";
+			print $unsolvedEl->{'row'},',',$unsolvedEl->{'col'},'), from',$unsolvedEl->{'from'},"to ",$unsolvedEl->{'to'},"\n";
+			
 			$s->makeChange(
 			    $unsolvedEl->{'row'},$unsolvedEl->{'col'},
-			    $unsolvedEl->{'to'});            
-			print "Attempting to solve\n";
-			$s->solve();
-			print "Done trying to solve\n";
-
-			if ( $s->isSolved() ) {
-				print "Sudoku solved\n";
-				#print $s->toString;
-				#print "Printing copy for good measure\n";
-				#print $s_copy->toString;
-				return 1;
-			} elsif ( ! $s->isConsistent() ) {
-				print "Sudoku inconsistent, restoring...\n";
-				print "Undoing change at (".$unsolvedEl->{'row'},',',$unsolvedEl->{'col'},'), restoring from',$unsolvedEl->{'to'},"to ",$unsolvedEl->{'from'},"\n";
-				$s->copy($s_copy);
-				next;
-			} else {
-				# not solved and consistent, then recurse
-				print "Sudoku still not solved, recursing...\n";
-				print $s->toString;
-				
-				$s->guessAndCheck();
-			}
+			    $unsolvedEl->{'to'});
+            return;			    
+			#$s->solve();
+#			$s->makeChange(
+#			    $unsolvedEl->{'row'},$unsolvedEl->{'col'},
+#			   $unsolvedEl->{'from'});			
+			
 		}
-
+		
+#		BOXEL: for ( all unsolved boxes ) {
+#			for ( all numbers avail ) {
+#				undoInfo = solve that number at that box
+#				if ( guessAndCheckRecurse ) {
+#					return 1;
+#					last BOXEL;
+#				}
+#				undoChange(undoInfo)
+#			}
+#		}
+#		sub undoChange
+#		
+#		sub guessAndCheckRecurse {
+#			tryToSolve
+#			if ( bad guess ) 
+#				return 0
+#			if ( stuck again )
+#				guessAndCheck			
+#			if ( solved )
+#				return 1;
+#			
+#		}
 		sub getUnsolvedStatesIterator {
 			my $s  = shift;
 			my @unsolvedElements;
@@ -537,9 +504,9 @@ use Moose;
 								}
 							);
 						}
-					}
+					}				
 				}
-			}
+			}			
 			# iterator return function
 			return sub {
 				if ( $iterIndex <= $#unsolvedElements ) {
@@ -547,22 +514,20 @@ use Moose;
 				} else {
 					return undef;
 				}
-			}
+			}		
 		}
 	}
-
+	
 	sub makeChange {
-		my $s = shift;
-		my ($rowIndex,$colIndex,$newSet) = @_;
-
-		my $row = $s->getRow($rowIndex);
-		my $set = $row->[$colIndex];
-		$set->clear();
-		$set->insert($newSet->members);	    
-		#$s->array->[$rowIndex][$colIndex]->clear;
-		#$s->array->[$rowIndex][$colIndex]->insert($newSet->members);
+	    my $s = shift;
+	    my ($rowIndex,$colIndex,$newSet) = @_;
+	    
+	    my $row = $s->getRow($rowIndex);
+	    my $set = $row->[$colIndex];
+	    $set->clear();
+	    $set->insert($newSet->members);	    
 	}
-
+	
 	sub solve {
 		my $s = shift;
 		my $iters = 0;
@@ -574,104 +539,29 @@ use Moose;
 			$elsGone += $s->eliminateInColAnswers();
 			$elsGone += $s->eliminateSolitaryBoxNumbers();
 			$elsGone += $s->eliminateInlineFromPairedNumbers();
-
+	
 		} while ( $elsGone > 0);
-
+		
 		# then do another three iterations for good measure
 		for ( 0 .. 2 ) {
 			$elsGone = $s->eliminateInBoxAnswers();
 			$elsGone += $s->eliminateInRowAnswers();
 			$elsGone += $s->eliminateInColAnswers();
 			$elsGone += $s->eliminateSolitaryBoxNumbers();
-			$elsGone += $s->eliminateInlineFromPairedNumbers();
-		}
-		#return $s->isSolved();
+			$elsGone += $s->eliminateInlineFromPairedNumbers();		
+		}		
+		#return $s->isSolved();	
 	}
-
+	
 	sub isConsistent {
 	    my $s = shift;
 	    my $elIterator = $s->elementIterator;
-	    # check for empty elements
 	    while ( my $nextEl = $elIterator->() ) {
 	        if ( $nextEl->size == 0 ) {
 	            return 0;
 	        }
 	    }
-	    # check for duplicated solved elements within a box
-	    my $nextBox = $s->boxIterator;
-	    while ( my $box = $nextBox->() ) {
-			my $solvedSet = Set::Object->new;
-			my $nextBoxEl = main::boxElementIterator($box);
-			while ( my $boxEl = $nextBoxEl->() ) {
-				if ( $boxEl->size == 1 ) {
-					if ( $solvedSet->contains($boxEl->members) ) {
-						return 0;
-					} else {
-						$solvedSet->insert($boxEl->members);
-					}
-				}
-			}
-	    }
-	    # check for duplicated solved elements within a row
-	    my $nextRow = $s->rowIterator;
-	    while ( my $row = $nextRow->() ) {
-			my $solvedSet = Set::Object->new;
-			for my $el ( @{$row} ) {
-				if ( $el->size == 1 ) {
-					if ( $solvedSet->contains($el->members) ) {
-						return 0;
-					} else {
-						$solvedSet->insert($el->members);
-					}
-				}
-			}
-		}
-	    # check for duplicated solved elements within a col
-	    my $nextCol = $s->colIterator;
-	    while ( my $col = $nextCol->() ) {
-			my $solvedSet = Set::Object->new;
-			for my $el ( @{$col} ) {
-				if ( $el->size == 1 ) {
-					if ( $solvedSet->contains($el->members) ) {
-						return 0;
-					} else {
-						$solvedSet->insert($el->members);
-					}
-				}
-			}
-		}  	    
 	    return 1;
-	}
-	
-	sub copy {
-		my ($su,$s_copy) = @_;
-
-		for my $i ( 0..8 ) {
-			for my $j ( 0..8 ) {
-				my $el = $su->array->[$i][$j];
-				$el->clear;
-				$el->insert($s_copy->array->[$i][$j]->members);
-			}
-		}
-	}
-	
-	sub getTopLeftSum {
-		my $s = shift;
-		
-		my $row = $s->getRow(0);
-		
-		my @elements;
-		for ( 0 .. 2 ) {
-			die if ($row->[$_]->size != 1 );
-			push(@elements,$row->[$_]->members);
-		}
-		my $digits = 0;
-		for ( @elements) {
-			$digits .= $_;
-		}
-		my $total = int($digits);
-		print "Combining ".scalar(@elements)." together: $elements[0] . $elements[1] . $elements[2] = $total\n";
-		return $total;
 	}
 
 __PACKAGE__->meta->make_immutable;
@@ -694,8 +584,7 @@ for ( <SU> ) {
 
 
 my $unsolveable = 0;
-my $runningTopLeftSum = 0;
-for my $i (46,46,46,46,46,46) {
+for my $i ( 6..6) {
 	print "On sudoku ".($i)."\n";
 	#print Dumper ($curSudoku[$i]);
 	my $s = createSudArray($curSudoku[$i]);
@@ -703,34 +592,48 @@ for my $i (46,46,46,46,46,46) {
 	my $sclass = Sudoku->new('array'=> $s);
 	# now we're an object
 	$sclass->solve();
-
-	#die;
 #	printBox($sclass->getBox(0,1));
 	if ( ! $sclass->isSolved() ) {
 		print "Sudoku $i unsolveable\n";
-		#print $sclass->toString();
 		$unsolveable++;
+		print $sclass->toString();
 		print "Attempting to use guess and check to solve\n";
 		$sclass->guessAndCheck();
-		if ( $sclass->isSolved ) {
-			print "Yay $i solved using guess and check\n";
-			$runningTopLeftSum += $sclass->getTopLeftSum;	
-		} else {
-			print "$i really unsolveable\n";
-			print $sclass->toString();
+		print $sclass->toString();
+		$sclass->solve;
+		print $sclass->toString;
+		unless ( $sclass->isConsistent ) {
+		    print "Sudoku is in an inconsistent state\n";
 		}
 	} else {
 		print "Sudoku $i solved\n";
-		
-		$runningTopLeftSum += $sclass->getTopLeftSum;
 	}
 	#print "Calling eliminateSolitaryBoxNumbers once\n";
 	#print "Trying to solve sudoku $i\n";
 	#solveSudoku ( $s );
-	print "Running sum is $runningTopLeftSum\n";
 }
 print "$unsolveable are unsolveable\n";
-print "Top left sum is $runningTopLeftSum\n";
+
+# solve sudoku
+sub solveSudoku {
+	my $s = shift;
+	my $iters = 0;
+	my $elsGone = 0;
+	do {
+		#print printSud($s);
+		$iters++;
+		$elsGone = eliminateInBoxAnswers($s);
+		$elsGone += eliminateInRowAnswers($s);
+		$elsGone += eliminateInColAnswers($s);
+		#$elsGone += eliminateSolitaryBoxNumbers($s);
+
+	} while ( $elsGone > 0);
+
+	print printSud($s);
+
+	print "Sudoku solved after $iters iterations\n";
+}
+
 
 sub getSolvedFromCol {
 	my $col = shift;

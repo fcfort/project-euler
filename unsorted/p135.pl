@@ -2,33 +2,42 @@
 use strict;
 use warnings;
 use Data::Dumper;
-#use Math::GMP;
-#use Math::Big::Factors;
+
 #my $n = 1155;
-use Benchmark;
+use Benchmark ':hireswallclock';
 
 my    $t0 = Benchmark->new;
-    # ... your code here ...
+my @divs = Divisors(234654562);
+my    $t2 = Benchmark->new;
+my $td = timediff($t2, $t0);
+    print "the code took:",timestr($td),"\n";
+    
+print join(',',@divs)."\n";
 
-for my $n (1..1e4) {
-   # my @factors = Math::Big::Factors::factors_wheel($n,3);
+    # ... your code here ...
+my @nums;
+for my $n (500000..600000) {
     #print "Factors are ".join(',',@factors)."\n";
     my $numSolns = 0;
-    #$numSolns = numDistinctSolutions ($n);
+    $numSolns = numDistinctSolutions ($n);
     if ( $numSolns == 10 ) {
         print "$n has $numSolns solns\n";
+        push(@nums,$n);
     }
 }
+print join(',',@nums)."\n";
 
 my    $t1 = Benchmark->new;
-my    $td = timediff($t1, $t0);
+   $td = timediff($t1, $t0);
     print "the code took:",timestr($td),"\n";
 
 
 sub numDistinctSolutions {
     my $n = shift;
     my $numSolutions = 0;
-    for my $y( 1 .. $n ) {
+    print $n . "\n" ;
+    my @divsn = Divisors($n);
+    for my $y(@divsn ) {
         my $div = $n/$y;
         next unless ( isInteger($div) );
         my $a = (-$div-$y)/4;
@@ -51,4 +60,14 @@ sub isInteger {
 }
 sub isNatural {
         return ($_[0] > 0 && isInteger($_[0]));
+}
+
+# attach to mathematica
+sub Divisors {
+	my $n = shift;
+	my $result = `./math -noprompt -noinit -run 'Print[Divisors[$n]];Exit[];'`;
+	chomp $result;
+	$result =~ s/[{} ]//g;
+	#print $result;
+	return split (m/,/,$result);
 }
