@@ -67,7 +67,7 @@ def test_13(strings, digits, digits_left):
             test_17(strings, d, digits_left - set([x]))
     return strings
 
-# Here d3 - d8 are set
+# Here d3 - d9 are set
 def test_17(strings, digits, digits_left):
     # 17
     for x in digits_left:
@@ -86,7 +86,7 @@ def test_remaining_digits(strings, digits, digits_left):
         strings.add("".join(map(str,d)))
     return strings
     
-strings = getDigits(set([]),  [-1] * 10, set([0,1,2,3,4,5,6,7,8,9]))
+strings = getDigits(set([]),  [-1] * 10, set(range(10)))
 
 for x in sorted(strings):
     print x
