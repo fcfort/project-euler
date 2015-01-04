@@ -16,6 +16,7 @@ def is_prime(n):
  
 class IsPrimeCached(dict):
     def __missing__(self, n):
+        print("in cache")
         r = is_prime(n)
         self[n] = r
         return r
