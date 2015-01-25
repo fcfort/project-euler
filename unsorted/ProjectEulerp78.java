@@ -1,6 +1,10 @@
 import java.util.*;
 import java.math.*;
 
+/**
+ * Uses MacMahon's recurrence relation for the partition function. 
+ * See http://mathworld.wolfram.com/PartitionFunctionP.html (formula 20)
+ */
 public class ProjectEulerp78 {
 
     private static Map<Integer, BigInteger> memo = new HashMap<Integer, BigInteger>();
