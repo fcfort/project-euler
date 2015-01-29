@@ -4,7 +4,7 @@ import java.util.*;
  * Very similar to problem 76 except with the use of primes as subtrahends 
  * instead of counting numbers. The only tricky part is that there is a new
  * base case, in which we cannot reach zero for a given number. In this instance
- * we don't increaes the count, returning zero instead.
+ * we don't increase the count, returning zero instead.
  * 
  * Prime listing function is memoized.
  */
