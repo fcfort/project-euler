@@ -1,65 +1,39 @@
-import java.util.*;
-import java.math.*;
-import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
+/** 
+ * Very slowwww solution that takes a couple of minutes to find the solution.
+ * Doesn't attempt to increment from the previous solutions and blindly retries
+ * all previous numbers for every new cuboid size M.
+ * 
+ * The solution is seeing that the shortest path across a cuboid of size l*w*h
+ * must be a straight line across two faces of the cuboid. Since there are three
+ * possible paths across the cuboid, we must take the minimum of those lengths
+ * and then see if that number is an integer.
+ */
 public class ProjectEulerp86 {
+
+    private static Set<Integer> PERFECT_SQUARES = new HashSet<Integer>();
     
-    public static void comb(int... items) {
-        Arrays.sort(items);
-        for (int k = 1; k <= items.length; k++) {
-            kcomb(items, 0, k, new int[k]);
-        }
-    }
-    public static void kcomb(int[] items, int n, int k, int[] arr) {
-        if (k == 0) {
-            System.out.println(Arrays.toString(arr));
-        } else {
-            for (int i = n; i <= items.length - k; i++) {
-                arr[arr.length - k] = items[i];
-                kcomb(items, i + 1, k - 1, arr);
-            }
-        }
-    }
-    
-    public static void main(String... args) {
-        // comb(1,2,3,4,5,7,8,9);
-        kcomb(new int[] {1,2,3,4,5,6}, 0, 3, new int[3]);
-        
-        Set<Integer> perfectSquares = new HashSet<Integer>();
+    static {
         for(int i = 0; i < 10000; i++) {
-            perfectSquares.add(i*i);
+            PERFECT_SQUARES.add(i*i);
         }
-        
-        int M = 99;
+    }
+
+    public static int countSolutions(int M) {
         int l = 1, w = 1, h = 1;
         int solutionCount = 0;
-        boolean carry = false;
         
-        int index = 2;
         while(true) {
-            // System.out.println(String.format("%dx%dx%d",l,w,h));
-            /*
-            if(perfectSquares.contains(w*w + (l+h)*(l+h))) { 
-                solutionCount++; 
-                System.out.println(String.format("1 hlw %dx%dx%d",h,l,w));
-            }
-            if(perfectSquares.contains(l*l + (h+w)*(h+w))) { 
-                solutionCount++; 
-                System.out.println(String.format("2 hlw %dx%dx%d",h,l,w));
-            }
-            if(perfectSquares.contains(h*h + (l+w)*(l+w))) { 
-                solutionCount++; 
-                System.out.println(String.format("3 hlw %dx%dx%d",h,l,w));
-            }
-            */
+            int minLengthSquared = Math.min(
+                w*w + (l+h)*(l+h),Math.min(
+                l*l + (h+w)*(h+w),
+                h*h + (l+w)*(l+w)
+            ));
             
-            if(
-                perfectSquares.contains(w*w + (l+h)*(l+h)) ||
-                perfectSquares.contains(l*l + (h+w)*(h+w)) ||
-                perfectSquares.contains(h*h + (l+w)*(l+w))
-            ) { 
+            if(PERFECT_SQUARES.contains(minLengthSquared)) { 
                 solutionCount++; 
-                System.out.println(String.format("1 lwh %dx%dx%d",l,w,h));
             }
             
             h++;
@@ -79,6 +53,29 @@ public class ProjectEulerp86 {
             
         }
         
-        System.out.println("Got " + solutionCount + " solutions for M = " + M);
+        return solutionCount;
+    }
+
+    public static void main(String... args) {
+    	
+        int M = 1800;
+        int incrementRate = 10;        
+        while(true) {
+            int solns = countSolutions(M);
+            System.out.println("Got " + solns + " solutions for M = " + M);
+                   
+            if(solns > 1000000) {
+            	if(incrementRate > 1) {
+            		M -= incrementRate;
+            		incrementRate >>= 1;
+            		incrementRate = incrementRate < 1 ? 1 : incrementRate; 
+            	} else {
+            		break;
+            	}
+            } else {
+            	M += incrementRate;
+            }
+            
+        }
     }
 }
