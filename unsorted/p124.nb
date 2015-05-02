@@ -1,0 +1,91 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      2505,         81]
+NotebookOptionsPosition[      2132,         64]
+NotebookOutlinePosition[      2477,         79]
+CellTagsIndexPosition[      2434,         76]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"f", ":=", 
+   RowBox[{"Function", "[", 
+    RowBox[{"Times", " ", "@@", " ", 
+     RowBox[{"First", " ", "/@", " ", 
+      RowBox[{"FactorInteger", "[", "#", "]"}]}]}], "]"}]}], 
+  "\[IndentingNewLine]"}]], "Input",
+ CellChangeTimes->{{3.461625389562375*^9, 3.461625393031125*^9}, {
+  3.461626052218625*^9, 3.461626071968625*^9}, {3.461626169062375*^9, 
+  3.461626171093625*^9}, {3.4616262045155*^9, 3.46162634154675*^9}, {
+  3.46162639979675*^9, 3.461626493468625*^9}, {3.46162653992175*^9, 
+  3.461626565781125*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SortBy", "[", 
+     RowBox[{
+      RowBox[{"Partition", "[", 
+       RowBox[{
+        RowBox[{"Riffle", "[", 
+         RowBox[{
+          RowBox[{"Range", "[", "100000", "]"}], ",", 
+          RowBox[{"Array", "[", 
+           RowBox[{"f", ",", "100000"}], "]"}]}], "]"}], ",", "2"}], "]"}], 
+      ",", "Last"}], "]"}], "[", 
+    RowBox[{"[", "10000", "]"}], "]"}], "[", 
+   RowBox[{"[", "1", "]"}], "]"}], "\[IndentingNewLine]"}]], "Input",
+ CellChangeTimes->{{3.46162728998425*^9, 3.461627292093625*^9}, {
+  3.461627403031125*^9, 3.461627412437375*^9}, {3.46162744310925*^9, 
+  3.4616274473905*^9}, {3.461627671718625*^9, 3.461627695078*^9}, {
+  3.46162773942175*^9, 3.46162776904675*^9}, {3.461627824124875*^9, 
+  3.46162788279675*^9}}],
+
+Cell[BoxData["21417"], "Output",
+ CellChangeTimes->{
+  3.46162744792175*^9, {3.4616276805155*^9, 3.46162769542175*^9}, 
+   3.46162776960925*^9, {3.461627837312375*^9, 3.461627886968625*^9}}]
+}, Open  ]]
+},
+WindowSize->{615, 750},
+WindowMargins->{{14, Automatic}, {64, Automatic}},
+FrontEndVersion->"7.0 for Microsoft Windows (32-bit) (November 10, 2008)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 553, 12, 52, "Input"],
+Cell[CellGroupData[{
+Cell[1123, 36, 800, 20, 72, InheritFromParent],
+Cell[1926, 58, 190, 3, 30, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
