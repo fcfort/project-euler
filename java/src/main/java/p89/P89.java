@@ -1,6 +1,12 @@
 package p89;
 
+import com.google.common.base.Charsets;
+
 import javax.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public final class P89 {
@@ -11,8 +17,30 @@ public final class P89 {
     this.minifier = minifier;
   }
 
-  public static void main(String[] args) {
-    System.out.println("hello world");
+  public static void main(String[] args) throws IOException {
+    P89 soln = new P89(new GreedyMinifier());
+
+    long answer;
+
+    InputStream stream = P89.class.getClassLoader().getResourceAsStream("p89/romans.txt");
+
+    try (BufferedReader r = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
+      answer =
+          r.lines()
+              .mapToLong(
+                  line -> {
+                    String minForm = soln.toMinimalForm(line);
+                    long lineDiff = line.length() - minForm.length();
+                    if (lineDiff < 0) {
+                      throw new RuntimeException(
+                          "Found minified version longer than input at " + line);
+                    }
+                    return lineDiff;
+                  })
+              .sum();
+    }
+
+    System.out.println("Answer is " + answer);
   }
 
   String toMinimalForm(String romanNumeral) {
